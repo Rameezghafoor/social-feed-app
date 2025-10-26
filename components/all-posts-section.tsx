@@ -143,15 +143,7 @@ export default function AllPostsSection({ selectedDate, searchQuery }: AllPostsS
 
             {post.images && post.images.length > 0 && (
               <div className="mb-3 sm:mb-4">
-                <AlbumGrid 
-                  images={post.images} 
-                  caption={post.caption} 
-                  title={post.title} 
-                  isAlbum={post.isAlbum} 
-                  showMobileRedirect={true}
-                  postId={post.id}
-                  platform={post.platform}
-                />
+                <AlbumGrid images={post.images} caption={post.caption} title={post.title} isAlbum={post.isAlbum} showMobileRedirect={true} />
               </div>
             )}
           </div>

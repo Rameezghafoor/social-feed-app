@@ -163,7 +163,6 @@ export default function ImageGallery({ images = [], isLoading = false }: ImageGa
         {images.map((image, index) => (
           <Card
             key={image.id}
-            id={`post-${image.id}`}
             className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                     onClick={(e) => {
                       e.preventDefault()

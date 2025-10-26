@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Home, Send } from "lucide-react"
 import Link from "next/link"
 import SearchBar from "@/components/search-bar"
-import { useSearchParams } from "next/navigation"
 
 interface GalleryImage {
   id: string
@@ -25,25 +24,10 @@ export default function GalleryPage() {
   const [loading, setLoading] = useState(true)
   const [selectedFolder, setSelectedFolder] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
-  const searchParams = useSearchParams()
-  const postId = searchParams.get('post')
-  const platform = searchParams.get('platform')
 
   useEffect(() => {
-    // Auto-select platform folder if coming from a specific post
-    if (platform && platform !== selectedFolder) {
-      setSelectedFolder(platform)
-    } else {
-      fetchImages()
-    }
-  }, [selectedFolder, platform])
-
-  useEffect(() => {
-    // Fetch images when platform changes
-    if (platform && platform !== selectedFolder) {
-      setSelectedFolder(platform)
-    }
-  }, [platform])
+    fetchImages()
+  }, [selectedFolder])
 
   const fetchImages = async () => {
     setLoading(true)
@@ -78,22 +62,6 @@ export default function GalleryPage() {
       (image.isAlbum && 'album'.includes(searchLower))
     )
   }, [images, searchQuery])
-
-  // Scroll to specific post if postId is provided
-  useEffect(() => {
-    if (postId && filteredImages.length > 0) {
-      // Find the post with matching ID and scroll to it
-      const postElement = document.getElementById(`post-${postId}`)
-      if (postElement) {
-        postElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        // Add highlight effect
-        postElement.classList.add('ring-2', 'ring-accent', 'ring-opacity-50')
-        setTimeout(() => {
-          postElement.classList.remove('ring-2', 'ring-accent', 'ring-opacity-50')
-        }, 3000)
-      }
-    }
-  }, [postId, filteredImages])
 
   const telegramLink = "https://t.me/your_channel_here"
 
