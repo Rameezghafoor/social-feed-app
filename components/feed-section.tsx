@@ -144,7 +144,15 @@ export default function FeedSection({ platform, selectedDate, searchQuery }: Fee
 
             {post.images && post.images.length > 0 && (
               <div className="mb-3 sm:mb-4">
-                <AlbumGrid images={post.images} caption={post.caption} title={post.title} isAlbum={post.isAlbum} showMobileRedirect={true} />
+                <AlbumGrid 
+                  images={post.images} 
+                  caption={post.caption} 
+                  title={post.title} 
+                  isAlbum={post.isAlbum} 
+                  showMobileRedirect={true}
+                  postId={post.id}
+                  platform={platform}
+                />
               </div>
             )}
           </div>

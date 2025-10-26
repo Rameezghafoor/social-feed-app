@@ -13,9 +13,11 @@ interface AlbumGridProps {
   title?: string
   isAlbum?: boolean
   showMobileRedirect?: boolean // New prop to control mobile redirect behavior
+  postId?: string // Post ID for direct linking
+  platform?: string // Platform for filtering in gallery
 }
 
-export default function AlbumGrid({ images, caption, title, isAlbum, showMobileRedirect = false }: AlbumGridProps) {
+export default function AlbumGrid({ images, caption, title, isAlbum, showMobileRedirect = false, postId, platform }: AlbumGridProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
   const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null)
@@ -425,7 +427,10 @@ export default function AlbumGrid({ images, caption, title, isAlbum, showMobileR
                 >
                   Cancel
                 </Button>
-                <Link href="/gallery" className="flex-1">
+                <Link 
+                  href={`/gallery${postId ? `?post=${postId}` : ''}${platform ? `&platform=${platform}` : ''}`} 
+                  className="flex-1"
+                >
                   <Button className="w-full bg-accent hover:bg-accent/90 text-white">
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Go to Gallery
