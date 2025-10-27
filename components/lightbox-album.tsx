@@ -20,7 +20,7 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
   const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null)
   const [showSwipeHint, setShowSwipeHint] = useState(false)
 
-  // Touch handlers for swipe down to close
+  // Touch handlers for custom swipe navigation
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null)
     setTouchStart({
@@ -30,6 +30,8 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStart) return
+    
     setTouchEnd({
       x: e.targetTouches[0].clientX,
       y: e.targetTouches[0].clientY,
@@ -39,12 +41,25 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!touchStart || !touchEnd) return
 
-    e.preventDefault()
     const deltaX = touchStart.x - touchEnd.x
     const deltaY = touchEnd.y - touchStart.y
+    const minSwipeDistance = 30 // Reduced threshold for minor swipes
+    const minVerticalSwipe = 80 // Higher threshold for closing
 
-    // Swipe down to close (minimum 60px down movement, allow some horizontal movement)
-    if (deltaY > 60 && Math.abs(deltaX) < 200) {
+    // Handle horizontal swipes for navigation (minor swipes)
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+      e.preventDefault()
+      if (deltaX > 0) {
+        // Swipe left - next image
+        setLightboxIndex((prev) => (prev + 1) % images.length)
+      } else {
+        // Swipe right - previous image
+        setLightboxIndex((prev) => (prev - 1 + images.length) % images.length)
+      }
+    }
+    // Handle vertical swipes for closing
+    else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > minVerticalSwipe) {
+      e.preventDefault()
       setLightboxOpen(false)
     }
 
@@ -171,7 +186,7 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              style={{ touchAction: 'pan-y' }}
+              style={{ touchAction: 'none' }}
             >
               <img
                 src={slide.src}
@@ -183,10 +198,10 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
                 }}
                 draggable={false}
               />
-              {/* Swipe down hint */}
+              {/* Swipe hints */}
               {showSwipeHint && (
                 <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium animate-pulse">
-                  Swipe down to close
+                  Swipe left/right to navigate • Swipe down to close
                 </div>
               )}
             </div>

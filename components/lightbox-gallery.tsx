@@ -47,9 +47,8 @@ export default function LightboxGallery({ images = [], isLoading = false }: Ligh
     }
   }, [lightboxOpen])
 
-  // Handle swipe down to close
+  // Touch handlers for custom swipe navigation
   const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault()
     setTouchEnd(null)
     setTouchStart({
       x: e.targetTouches[0].clientX,
@@ -59,7 +58,7 @@ export default function LightboxGallery({ images = [], isLoading = false }: Ligh
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!touchStart) return
-    e.preventDefault()
+    
     setTouchEnd({
       x: e.targetTouches[0].clientX,
       y: e.targetTouches[0].clientY
@@ -69,12 +68,25 @@ export default function LightboxGallery({ images = [], isLoading = false }: Ligh
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!touchStart || !touchEnd) return
     
-    e.preventDefault()
     const deltaX = touchStart.x - touchEnd.x
     const deltaY = touchEnd.y - touchStart.y
-    
-    // Swipe down to close (minimum 60px down movement, allow some horizontal movement)
-    if (deltaY > 60 && Math.abs(deltaX) < 200) {
+    const minSwipeDistance = 30 // Reduced threshold for minor swipes
+    const minVerticalSwipe = 80 // Higher threshold for closing
+
+    // Handle horizontal swipes for navigation (minor swipes)
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+      e.preventDefault()
+      if (deltaX > 0) {
+        // Swipe left - next image
+        setLightboxIndex((prev) => (prev + 1) % getCurrentSlides().length)
+      } else {
+        // Swipe right - previous image
+        setLightboxIndex((prev) => (prev - 1 + getCurrentSlides().length) % getCurrentSlides().length)
+      }
+    }
+    // Handle vertical swipes for closing
+    else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > minVerticalSwipe) {
+      e.preventDefault()
       setLightboxOpen(false)
     }
     
@@ -245,7 +257,7 @@ export default function LightboxGallery({ images = [], isLoading = false }: Ligh
       <Lightbox
         open={lightboxOpen}
         close={() => setLightboxOpen(false)}
-        index={0} // Always start from first image of the album
+        index={lightboxIndex} // Use lightboxIndex for custom navigation
         slides={getCurrentSlides()}
         carousel={{
           finite: true,
@@ -257,7 +269,7 @@ export default function LightboxGallery({ images = [], isLoading = false }: Ligh
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              style={{ touchAction: 'pan-y' }}
+              style={{ touchAction: 'none' }}
             >
               <img
                 src={slide.src}
@@ -270,10 +282,10 @@ export default function LightboxGallery({ images = [], isLoading = false }: Ligh
                 draggable={false}
               />
               
-              {/* Swipe down hint */}
+              {/* Swipe hints */}
               {showSwipeHint && (
                 <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium animate-pulse">
-                  Swipe down to close
+                  Swipe left/right to navigate • Swipe down to close
                 </div>
               )}
             </div>
