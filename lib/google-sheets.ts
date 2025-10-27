@@ -86,7 +86,7 @@ export async function fetchPostsFromSheet(date: string): Promise<SheetPost[]> {
             title: row[0] || '',
             content: row[1] || '',
             platform: platform,
-            author: 'Anonymous', // Default author since sheet doesn't have author column
+            author: 'leakurge DEMO', // Default author since sheet doesn't have author column
             date: parsedDate,
             likes: 0, // Default value since not in spreadsheet
             comments: 0, // Default value since not in spreadsheet

@@ -60,9 +60,10 @@ export default function FeedSection({ platform, selectedDate, searchQuery }: Fee
         }
       }
       
-      const response = await fetch(`/api/posts?platform=${platform}&date=${dateParam}`)
+      const response = await fetch(`/api/cached-posts?platform=${platform}&date=${dateParam}`)
       const data = await response.json()
       setPosts(data.posts || [])
+      console.log(`Posts loaded from ${data.cached ? 'cache' : 'API'}`)
     } catch (error) {
       console.error("Error fetching posts:", error)
       setPosts([])

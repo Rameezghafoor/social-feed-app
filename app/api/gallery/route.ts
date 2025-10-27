@@ -28,7 +28,11 @@ export async function GET(request: NextRequest) {
           folder: post.platform,
           isAlbum: true,
           albumImages: post.images.map(img => convertDriveUrlToDirectUrl(img)),
-          albumCount: post.images.length
+          albumCount: post.images.length,
+          author: post.author,
+          platform: post.platform,
+          content: post.content,
+          caption: post.caption
         })
       } else if (post.images && post.images.length === 1) {
         // Single image from images array
@@ -39,7 +43,11 @@ export async function GET(request: NextRequest) {
           alt: post.caption || post.title,
           uploadedAt: formattedDate,
           folder: post.platform,
-          isAlbum: false
+          isAlbum: false,
+          author: post.author,
+          platform: post.platform,
+          content: post.content,
+          caption: post.caption
         })
       } else if (post.imageUrl) {
         // Single image from imageUrl
@@ -50,7 +58,11 @@ export async function GET(request: NextRequest) {
           alt: post.caption || post.title,
           uploadedAt: formattedDate,
           folder: post.platform,
-          isAlbum: false
+          isAlbum: false,
+          author: post.author,
+          platform: post.platform,
+          content: post.content,
+          caption: post.caption
         })
       }
     })

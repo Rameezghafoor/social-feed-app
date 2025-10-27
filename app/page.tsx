@@ -37,7 +37,7 @@ export default function Home() {
           <div className="flex items-center justify-between gap-2 sm:gap-3">
             <div className="min-w-0 flex-1">
               <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-accent font-semibold truncate drop-shadow-md">
-                leakurge
+                leakurge DEMO
               </h1>
               <p className="text-muted-foreground/80 text-xs sm:text-sm mt-0.5 sm:mt-1 truncate font-medium">
                 Join Premium Group

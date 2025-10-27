@@ -32,9 +32,10 @@ export default function GalleryPage() {
   const fetchImages = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/gallery?folder=${selectedFolder}`)
+      const response = await fetch(`/api/cached-gallery?folder=${selectedFolder}`)
       const data = await response.json()
       setImages(data.images || [])
+      console.log(`Gallery images loaded from ${data.cached ? 'cache' : 'API'}`)
     } catch (error) {
       console.error("Error fetching images:", error)
       setImages([])
@@ -79,7 +80,7 @@ export default function GalleryPage() {
           <div className="flex items-center justify-between gap-2 sm:gap-3">
             <div className="min-w-0 flex-1">
               <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-accent font-semibold truncate drop-shadow-md">
-                leakurge
+                leakurge DEMO
               </h1>
               <p className="text-muted-foreground/80 text-xs sm:text-sm mt-0.5 sm:mt-1 truncate font-medium">
                 Join Premium Group

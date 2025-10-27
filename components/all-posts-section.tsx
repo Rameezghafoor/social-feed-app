@@ -59,9 +59,10 @@ export default function AllPostsSection({ selectedDate, searchQuery }: AllPostsS
         }
       }
       
-      const response = await fetch(`/api/posts?platform=all&date=${dateParam}`)
+      const response = await fetch(`/api/cached-posts?platform=all&date=${dateParam}`)
       const data = await response.json()
       setPosts(data.posts || [])
+      console.log(`All posts loaded from ${data.cached ? 'cache' : 'API'}`)
     } catch (error) {
       console.error("Error fetching posts:", error)
       setPosts([])

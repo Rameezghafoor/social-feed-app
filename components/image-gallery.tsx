@@ -160,43 +160,74 @@ export default function ImageGallery({ images = [], isLoading = false }: ImageGa
     <>
       {/* Gallery Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {images.map((image, index) => (
-          <Card
-            key={image.id}
-            className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      if (isClosing) return // Prevent opening during closing
-                      setSelectedImage(image)
-                      setCurrentIndex(index)
-                      setCurrentAlbumIndex(0) // Reset album index when selecting new image
-                      setTouchStart(null)
-                      setTouchEnd(null)
-                    }}
-          >
-            <div className="p-3">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-sm truncate">{image.title}</h3>
-                {image.isAlbum && (
-                  <Badge className="bg-accent/20 text-accent border-0 flex items-center gap-1 text-xs">
-                    <ImageIcon className="h-3 w-3" />
-                    Album ({image.albumCount})
-                  </Badge>
-                )}
+        {images.map((image, index) => {
+          // Platform colors matching home page
+          const platformColors: Record<string, { bg: string; text: string }> = {
+            chamet: { bg: "bg-blue-500", text: "text-white" },
+            tango: { bg: "bg-purple-500", text: "text-white" },
+            viral: { bg: "bg-red-500", text: "text-white" },
+            other: { bg: "bg-gray-500", text: "text-white" },
+          }
+          
+          const colors = platformColors[image.platform || 'other'] || platformColors['other']
+          
+          return (
+            <Card
+              key={image.id}
+              className="backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 rounded-2xl p-3 sm:p-4 md:p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-accent/30 cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (isClosing) return // Prevent opening during closing
+                setSelectedImage(image)
+                setCurrentIndex(index)
+                setCurrentAlbumIndex(0) // Reset album index when selecting new image
+                setTouchStart(null)
+                setTouchEnd(null)
+              }}
+            >
+              {/* Post Header - Same as home page */}
+              <div className="flex items-start justify-between mb-3 sm:mb-4 gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2 flex-wrap">
+                    <h3 className="font-semibold text-sm sm:text-base md:text-lg truncate">{image.author || 'leakurge DEMO'}</h3>
+                    <Badge className={`${colors.bg} ${colors.text} border-0 text-xs`}>
+                      {(image.platform || 'other').charAt(0).toUpperCase() + (image.platform || 'other').slice(1)}
+                    </Badge>
+                    {image.isAlbum && (
+                      <Badge className="bg-accent/20 text-accent border-0 flex items-center gap-1 text-xs">
+                        <ImageIcon className="h-3 w-3" />
+                        Album
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{image.uploadedAt}</p>
+                </div>
               </div>
-              <p className="text-xs text-muted-foreground mb-3">{image.uploadedAt}</p>
+
+              {/* Post Title - Same as home page */}
+              {image.title && <h2 className="text-base sm:text-lg md:text-xl font-bold mb-2 text-accent">{image.title}</h2>}
+
+              {/* Post Content - Same as home page */}
+              {image.content && (
+                <p className="text-xs sm:text-sm md:text-base text-foreground mb-3 sm:mb-4 leading-relaxed line-clamp-3">
+                  {image.content}
+                </p>
+              )}
               
-              {/* Use AlbumGrid for albums, regular image for singles */}
+              {/* Images - Use AlbumGrid for albums, regular image for singles */}
               {image.isAlbum && image.albumImages ? (
-                <AlbumGrid 
-                  images={image.albumImages} 
-                  caption={image.alt}
-                  title={image.title}
-                  isAlbum={true}
-                />
+                <div className="mb-3 sm:mb-4">
+                  <AlbumGrid 
+                    images={image.albumImages} 
+                    caption={image.caption}
+                    title={image.title}
+                    isAlbum={true}
+                    showMobileRedirect={true}
+                  />
+                </div>
               ) : (
-                <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
+                <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden mb-3 sm:mb-4">
                   <Image
                     src={image.url || "/placeholder.svg"}
                     alt={image.alt}
@@ -208,9 +239,9 @@ export default function ImageGallery({ images = [], isLoading = false }: ImageGa
                   />
                 </div>
               )}
-            </div>
-          </Card>
-        ))}
+            </Card>
+          )
+        })}
       </div>
 
       {/* Lightbox Modal */}
@@ -297,8 +328,8 @@ export default function ImageGallery({ images = [], isLoading = false }: ImageGa
                 </Button>
 
                 <div className="text-white text-center flex-1">
-                  <p className="font-semibold">{selectedImage.title}</p>
-                  <p className="text-sm text-gray-300">{selectedImage.uploadedAt}</p>
+                  <p className="font-semibold">{selectedImage.author || 'leakurge DEMO'}</p>
+                  <p className="text-sm text-gray-300">{selectedImage.title}</p>
                   <p className="text-xs text-gray-400 mt-1">
                     {currentAlbumIndex + 1} / {selectedImage.albumImages.length} (Album)
                   </p>
@@ -321,8 +352,8 @@ export default function ImageGallery({ images = [], isLoading = false }: ImageGa
             {/* Single Image Info */}
             {(!selectedImage.isAlbum || !selectedImage.albumImages || selectedImage.albumImages.length <= 1) && (
               <div className="text-white text-center mt-4">
-                <p className="font-semibold">{selectedImage.title}</p>
-                <p className="text-sm text-gray-300">{selectedImage.uploadedAt}</p>
+                <p className="font-semibold">{selectedImage.author || 'leakurge DEMO'}</p>
+                <p className="text-sm text-gray-300">{selectedImage.title}</p>
                 <p className="text-xs text-gray-400 mt-1">
                   {currentIndex + 1} / {images.length}
                 </p>
