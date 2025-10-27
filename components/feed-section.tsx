@@ -133,7 +133,16 @@ export default function FeedSection({ platform, selectedDate, searchQuery }: Fee
                     </Badge>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">{post.timestamp}</p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(post.timestamp).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  })}
+                </p>
               </div>
             </div>
 
