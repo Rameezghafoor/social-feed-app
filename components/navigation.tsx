@@ -2,8 +2,7 @@
 
 import { format, subDays, startOfDay, parse, isValid } from "date-fns"
 import { Button } from "@/components/ui/button"
-import { Calendar, ImageIcon } from "lucide-react"
-import Link from "next/link"
+import { Calendar } from "lucide-react"
 import { useState } from "react"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
@@ -54,19 +53,10 @@ export default function Navigation({ selectedDate, onDateChange }: NavigationPro
   return (
     <div className="backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 border-b">
       <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-center mb-4">
           <div>
             <h2 className="text-2xl font-bold text-accent font-semibold drop-shadow-lg">Feed Hub</h2>
           </div>
-          <Link href="/gallery">
-            <Button
-              variant="outline"
-              className="gap-2 backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 bg-transparent hover:border-accent/50 transition-colors"
-            >
-              <ImageIcon className="h-4 w-4" />
-              Gallery
-            </Button>
-          </Link>
         </div>
 
         <div className="backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-accent/30">

@@ -19,6 +19,8 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
   const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null)
   const [showSwipeHint, setShowSwipeHint] = useState(false)
+  const [imagesLoaded, setImagesLoaded] = useState<Set<number>>(new Set())
+  const [isLoading, setIsLoading] = useState(false)
 
   // Touch handlers for custom swipe navigation
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -68,6 +70,28 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
     setTouchEnd(null)
   }
 
+  // Preload images when lightbox opens
+  useEffect(() => {
+    if (lightboxOpen && images.length > 0) {
+      setIsLoading(true)
+      const preloadPromises = images.map((imageUrl, index) => {
+        return new Promise<void>((resolve) => {
+          const img = new Image()
+          img.onload = () => {
+            setImagesLoaded(prev => new Set([...prev, index]))
+            resolve()
+          }
+          img.onerror = () => resolve() // Continue even if image fails
+          img.src = imageUrl
+        })
+      })
+      
+      Promise.all(preloadPromises).then(() => {
+        setIsLoading(false)
+      })
+    }
+  }, [lightboxOpen, images])
+
   // Show swipe hint on mobile when lightbox opens
   useEffect(() => {
     if (lightboxOpen) {
@@ -99,19 +123,20 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
     return (
       <div className="w-full">
         <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden mb-3 sm:mb-4 group">
-          <Image
-            src={images[0] || "/placeholder.svg"}
-            alt={title || "Image"}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
-            onClick={() => {
-              setLightboxIndex(0)
-              setLightboxOpen(true)
-            }}
-            loading="lazy"
-            quality={85}
-          />
+            <Image
+              src={images[0] || "/placeholder.svg"}
+              alt={title || "Image"}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+              onClick={() => {
+                setLightboxIndex(0)
+                setLightboxOpen(true)
+              }}
+              loading="eager"
+              priority
+              quality={90}
+            />
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -144,8 +169,9 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
               fill
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 16vw"
               className="object-cover group-hover:scale-105 transition-transform duration-300"
-              loading="lazy"
-              quality={85}
+              loading={index < 4 ? "eager" : "lazy"}
+              priority={index < 4}
+              quality={90}
             />
             {/* Show +X overlay on last visible image */}
             {index === 3 && images.length > 4 && (
@@ -188,18 +214,26 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
               onTouchEnd={handleTouchEnd}
               style={{ touchAction: 'none' }}
             >
-              <img
-                src={slide.src}
-                alt={slide.alt}
-                className="max-w-full max-h-full object-contain select-none"
-                style={{
-                  maxWidth: rect.width,
-                  maxHeight: rect.height,
-                }}
-                draggable={false}
-              />
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
+                  <p className="text-white text-sm">Loading images...</p>
+                </div>
+              ) : (
+                <img
+                  src={slide.src}
+                  alt={slide.alt}
+                  className="max-w-full max-h-full object-contain select-none"
+                  style={{
+                    maxWidth: rect.width,
+                    maxHeight: rect.height,
+                  }}
+                  draggable={false}
+                  loading="eager"
+                />
+              )}
               {/* Swipe hints */}
-              {showSwipeHint && (
+              {showSwipeHint && !isLoading && (
                 <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium animate-pulse">
                   Swipe left/right to navigate • Swipe down to close
                 </div>
