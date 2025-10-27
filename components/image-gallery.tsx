@@ -223,7 +223,6 @@ export default function ImageGallery({ images = [], isLoading = false }: ImageGa
                     caption={image.caption}
                     title={image.title}
                     isAlbum={true}
-                    showMobileRedirect={true}
                   />
                 </div>
               ) : (
