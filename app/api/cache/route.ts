@@ -28,3 +28,6 @@ export async function DELETE() {
     return NextResponse.json({ error: "Failed to clear cache" }, { status: 500 })
   }
 }
+
+
+

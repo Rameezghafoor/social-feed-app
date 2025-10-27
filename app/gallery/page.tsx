@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import ImageGallery from "@/components/image-gallery"
+import LightboxGallery from "@/components/lightbox-gallery"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Home, Send } from "lucide-react"
@@ -137,7 +137,7 @@ export default function GalleryPage() {
         </div>
 
         {/* Gallery Component */}
-        <ImageGallery images={filteredImages} isLoading={loading} />
+        <LightboxGallery images={filteredImages} isLoading={loading} />
       </div>
     </main>
   )

@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, ImageIcon } from "lucide-react"
-import AlbumGrid from "@/components/album-grid"
+import LightboxAlbum from "@/components/lightbox-album"
 
 interface Post {
   id: string
@@ -144,7 +144,7 @@ export default function AllPostsSection({ selectedDate, searchQuery }: AllPostsS
 
             {post.images && post.images.length > 0 && (
               <div className="mb-3 sm:mb-4">
-                <AlbumGrid images={post.images} caption={post.caption} title={post.title} isAlbum={post.isAlbum} showMobileRedirect={true} />
+                <LightboxAlbum images={post.images} caption={post.caption} title={post.title} isAlbum={post.isAlbum} />
               </div>
             )}
           </div>
