@@ -71,14 +71,9 @@ export default function GalleryPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-background">
-      {/* Feed Hub Header - Same style as home screen */}
       <div
         onClick={handleHeaderClick}
-        className="backdrop-blur-md bg-white/30 dark:bg-white/25 border border-white/60 dark:border-white/50 border-b sticky top-0 z-50 cursor-pointer hover:bg-white/40 dark:hover:bg-white/30 transition-all duration-300 shadow-xl"
-        style={{ 
-          backgroundColor: 'rgba(255, 255, 255, 0.3)',
-          minHeight: '80px'
-        }}
+        className="backdrop-blur-md bg-white/15 dark:bg-white/10 border border-white/30 dark:border-white/20 border-b sticky top-0 z-50 cursor-pointer hover:bg-white/20 dark:hover:bg-white/12 transition-all duration-300 shadow-lg"
       >
         <div className="w-full px-3 py-3 sm:px-4 sm:py-4">
           <div className="flex items-center justify-between gap-2 sm:gap-3">
@@ -86,7 +81,7 @@ export default function GalleryPage() {
               <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-accent font-semibold truncate drop-shadow-md">
                 leakurge
               </h1>
-              <p className="text-muted-foreground/90 text-xs sm:text-sm mt-0.5 sm:mt-1 truncate font-medium">
+              <p className="text-muted-foreground/80 text-xs sm:text-sm mt-0.5 sm:mt-1 truncate font-medium">
                 Join Premium Group
               </p>
             </div>
