@@ -134,14 +134,24 @@ export default function FeedSection({ platform, selectedDate, searchQuery }: Fee
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {new Date(post.timestamp).toLocaleString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
-                  })}
+                  {(() => {
+                    try {
+                      const date = new Date(post.timestamp)
+                      if (isNaN(date.getTime())) {
+                        return 'Invalid Date'
+                      }
+                      return date.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                      })
+                    } catch (error) {
+                      return 'Invalid Date'
+                    }
+                  })()}
                 </p>
               </div>
             </div>

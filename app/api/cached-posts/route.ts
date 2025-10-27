@@ -19,6 +19,12 @@ export async function GET(request: NextRequest) {
       console.log(`Cache miss for key: ${cacheKey}`)
       posts = await fetchPostsFromSheet(date)
       
+      // Map date field to timestamp for consistency
+      posts = posts.map((post: any) => ({
+        ...post,
+        timestamp: post.date || new Date().toISOString()
+      }))
+      
       // Filter by platform if not "all"
       if (platform !== "all") {
         posts = posts.filter((post: any) => post.platform === platform)
