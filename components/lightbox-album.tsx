@@ -43,19 +43,24 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
 
     const deltaX = touchStart.x - touchEnd.x
     const deltaY = touchEnd.y - touchStart.y
-    const minSwipeDistance = 30 // Reduced threshold for minor swipes
+    const minSwipeDistance = 40 // Balanced threshold for smooth swipes
     const minVerticalSwipe = 80 // Higher threshold for closing
+    const maxSwipeDistance = 200 // Prevent overly sensitive swipes
 
-    // Handle horizontal swipes for navigation (minor swipes)
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+    // Handle horizontal swipes for navigation with balanced sensitivity
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance && Math.abs(deltaX) < maxSwipeDistance) {
       e.preventDefault()
-      if (deltaX > 0) {
-        // Swipe left - next image
-        setLightboxIndex((prev) => (prev + 1) % images.length)
-      } else {
-        // Swipe right - previous image
-        setLightboxIndex((prev) => (prev - 1 + images.length) % images.length)
-      }
+      
+      // Add slight delay for smoother transition
+      setTimeout(() => {
+        if (deltaX > 0) {
+          // Swipe left - next image
+          setLightboxIndex((prev) => (prev + 1) % images.length)
+        } else {
+          // Swipe right - previous image  
+          setLightboxIndex((prev) => (prev - 1 + images.length) % images.length)
+        }
+      }, 50) // Small delay for smoother experience
     }
     // Handle vertical swipes for closing
     else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > minVerticalSwipe) {
