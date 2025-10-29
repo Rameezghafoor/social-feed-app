@@ -7,8 +7,8 @@ interface CacheEntry {
 
 const cache = new Map<string, CacheEntry>()
 
-// Cache TTL: 5 minutes
-const CACHE_TTL = 5 * 60 * 1000
+// Cache TTL: 15 minutes
+const CACHE_TTL = 15 * 60 * 1000
 
 export function getCachedData(key: string): any | null {
   const entry = cache.get(key)
@@ -45,6 +45,7 @@ export function getCacheStats() {
     keys: Array.from(cache.keys())
   }
 }
+
 
 
 
