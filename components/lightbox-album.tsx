@@ -132,6 +132,8 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
   // Album display
   return (
     <div className="w-full">
+      {/** prepare slides and safe index to avoid any runtime issues */}
+      {(() => null)()}
       {/* Album Grid Display */}
       <div className="grid grid-cols-2 gap-1 mb-3 sm:mb-4">
         {images.slice(0, 4).map((image, index) => (
@@ -176,15 +178,24 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
       </div>
 
       {/* Lightbox */}
-      <Lightbox
-        open={lightboxOpen}
-        close={() => setLightboxOpen(false)}
-        index={lightboxIndex}
-        slides={getCurrentSlides()}
-        carousel={{
-          finite: true,
-        }}
-        render={{
+      {(() => {
+        const slides = getCurrentSlides()
+        const safeIndex = Math.max(0, Math.min(lightboxIndex, Math.max(0, slides.length - 1)))
+        if (!lightboxOpen || slides.length === 0) return null
+        return (
+          <Lightbox
+            open={lightboxOpen}
+            close={() => setLightboxOpen(false)}
+            index={safeIndex}
+            slides={slides}
+            animation={{
+              fade: 300,
+              swipe: 400,
+            }}
+            carousel={{
+              finite: true,
+            }}
+            render={{
           slide: ({ slide, rect }) => (
             <div
               className="relative w-full h-full flex items-center justify-center"
@@ -210,10 +221,12 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
                 </div>
               )}
             </div>
-          ),
-        }}
-        plugins={[]}
-      />
+              ),
+            }}
+            plugins={[]}
+          />
+        )
+      })()}
     </div>
   )
 }
