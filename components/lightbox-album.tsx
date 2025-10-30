@@ -188,10 +188,6 @@ export default function LightboxAlbum({ images, caption, title, isAlbum }: Light
             close={() => setLightboxOpen(false)}
             index={safeIndex}
             slides={slides}
-            animation={{
-              fade: 300,
-              swipe: 400,
-            }}
             carousel={{
               finite: true,
             }}
