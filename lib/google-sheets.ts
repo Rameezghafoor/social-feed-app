@@ -108,11 +108,34 @@ export async function fetchPostsFromSheet(date: string): Promise<SheetPost[]> {
     
     // Filter by date if not "all"
     if (date !== "all") {
+      const now = new Date()
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      if (date === 'last-7') {
+        const threshold = new Date(startOfToday)
+        threshold.setDate(threshold.getDate() - 6) // include today + previous 6 days
+        return posts.filter(post => new Date(post.date) >= threshold)
+      }
+      if (date === 'last-30') {
+        const threshold = new Date(startOfToday)
+        threshold.setDate(threshold.getDate() - 29)
+        return posts.filter(post => new Date(post.date) >= threshold)
+      }
+      if (date === 'today') {
+        return posts.filter(post => {
+          const d = new Date(post.date)
+          return d.toDateString() === startOfToday.toDateString()
+        })
+      }
+      if (date === 'yesterday') {
+        const y = new Date(startOfToday)
+        y.setDate(y.getDate() - 1)
+        return posts.filter(post => new Date(post.date).toDateString() === y.toDateString())
+      }
+      // Fallback: exact day match for provided date string (yyyy-MM-dd or ISO)
       const targetDate = new Date(date)
-      return posts.filter(post => {
-        const postDate = new Date(post.date)
-        return postDate.toDateString() === targetDate.toDateString()
-      })
+      if (!isNaN(targetDate.getTime())) {
+        return posts.filter(post => new Date(post.date).toDateString() === targetDate.toDateString())
+      }
     }
     
     return posts

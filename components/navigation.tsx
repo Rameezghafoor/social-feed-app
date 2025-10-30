@@ -35,12 +35,27 @@ export default function Navigation({ selectedDate, onDateChange }: NavigationPro
 
   const handleDateShortcut = (days: number) => {
     if (days === -1) {
-      // For "All" button, we'll pass a special value
-      onDateChange(new Date("all"))
-    } else {
-      const newDate = subDays(startOfDay(new Date()), days)
-      onDateChange(newDate)
+      onDateChange("all" as unknown as Date)
+      return
     }
+    if (days === 7) {
+      onDateChange("last-7" as unknown as Date)
+      return
+    }
+    if (days === 30) {
+      onDateChange("last-30" as unknown as Date)
+      return
+    }
+    if (days === 0) {
+      onDateChange("today" as unknown as Date)
+      return
+    }
+    if (days === 1) {
+      onDateChange("yesterday" as unknown as Date)
+      return
+    }
+    const newDate = subDays(startOfDay(new Date()), days)
+    onDateChange(newDate)
   }
 
   const handleCalendarSelect = (date: Date | undefined) => {

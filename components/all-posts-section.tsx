@@ -52,10 +52,14 @@ export default function AllPostsSection({ selectedDate, searchQuery }: AllPostsS
         // Only format if it's a valid Date object
         dateParam = format(selectedDate, "yyyy-MM-dd")
       } else if (typeof selectedDate === "string" && selectedDate !== "all") {
-        // If it's a string but not "all", try to parse it as a date
-        const parsedDate = new Date(selectedDate)
-        if (!isNaN(parsedDate.getTime())) {
-          dateParam = format(parsedDate, "yyyy-MM-dd")
+        const keywords = ["last-7", "last-30", "today", "yesterday"]
+        if (keywords.includes(selectedDate)) {
+          dateParam = selectedDate
+        } else {
+          const parsedDate = new Date(selectedDate)
+          if (!isNaN(parsedDate.getTime())) {
+            dateParam = format(parsedDate, "yyyy-MM-dd")
+          }
         }
       }
       
