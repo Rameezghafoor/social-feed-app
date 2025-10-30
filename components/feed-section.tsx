@@ -117,7 +117,7 @@ export default function FeedSection({ platform, selectedDate, searchQuery }: Fee
         return (
           <div
             key={post.id}
-            className="backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 rounded-2xl p-3 sm:p-4 md:p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-accent/30"
+            className="anim-in hover-float backdrop-blur-md bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 rounded-2xl p-3 sm:p-4 md:p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:border-accent/30"
           >
             <div className="flex items-start justify-between mb-3 sm:mb-4 gap-2">
               <div className="flex-1 min-w-0">
