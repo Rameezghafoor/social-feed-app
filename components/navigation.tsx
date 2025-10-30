@@ -116,30 +116,30 @@ export default function Navigation({ selectedDate, onDateChange }: NavigationPro
             <div className="flex flex-wrap gap-2">
               {shortcuts.map((shortcut) => {
                 let isActive = false
-                
+                // String keyword states
                 if (shortcut.days === -1) {
-                  // All button - active when selectedDate is "all" or when it's not a valid date
-                  isActive = selectedDate === "all" || (selectedDate instanceof Date && isNaN(selectedDate.getTime()))
+                  isActive = selectedDate === "all"
                 } else if (shortcut.days === 0) {
-                  // Today button - only active if selectedDate is a valid Date and it's today
-                  isActive = selectedDate !== "all" && selectedDate instanceof Date && !isNaN(selectedDate.getTime()) && format(selectedDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd")
+                  isActive = selectedDate === "today"
                 } else if (shortcut.days === 1) {
-                  // Yesterday button - only active if selectedDate is a valid Date and it's yesterday
-                  const yesterday = new Date()
-                  yesterday.setDate(yesterday.getDate() - 1)
-                  isActive = selectedDate !== "all" && selectedDate instanceof Date && !isNaN(selectedDate.getTime()) && format(selectedDate, "yyyy-MM-dd") === format(yesterday, "yyyy-MM-dd")
+                  isActive = selectedDate === "yesterday"
                 } else if (shortcut.days === 7) {
-                  // Last 7 days button - only active if selectedDate is a valid Date and it's 7 days ago
-                  const sevenDaysAgo = new Date()
-                  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
-                  isActive = selectedDate !== "all" && selectedDate instanceof Date && !isNaN(selectedDate.getTime()) && format(selectedDate, "yyyy-MM-dd") === format(sevenDaysAgo, "yyyy-MM-dd")
+                  isActive = selectedDate === "last-7"
                 } else if (shortcut.days === 30) {
-                  // Last 30 days button - only active if selectedDate is a valid Date and it's 30 days ago
-                  const thirtyDaysAgo = new Date()
-                  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-                  isActive = selectedDate !== "all" && selectedDate instanceof Date && !isNaN(selectedDate.getTime()) && format(selectedDate, "yyyy-MM-dd") === format(thirtyDaysAgo, "yyyy-MM-dd")
+                  isActive = selectedDate === "last-30"
                 }
-                
+
+                // Date instances (when user picks from calendar)
+                if (!isActive && selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
+                  if (shortcut.days === 0) {
+                    isActive = format(selectedDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd")
+                  } else if (shortcut.days === 1) {
+                    const y = new Date()
+                    y.setDate(y.getDate() - 1)
+                    isActive = format(selectedDate, "yyyy-MM-dd") === format(y, "yyyy-MM-dd")
+                  }
+                }
+
                 return (
                   <button
                     key={shortcut.days}
