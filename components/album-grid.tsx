@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight, ImageIcon, X, ExternalLink } from "lucide-react"
+import { ChevronLeft, ChevronRight, ImageIcon, X, ExternalLink, Video } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { isVideoUrl } from "@/lib/utils"
 
 interface AlbumGridProps {
   images: string[]
@@ -156,12 +157,37 @@ export default function AlbumGrid({ images, caption, title, isAlbum, showMobileR
   if (!images || images.length === 0) return null
 
   if (images.length === 1) {
+    const isVideo = isVideoUrl(images[0])
     return (
       <div className="w-full">
         <div className="relative overflow-hidden rounded-lg bg-muted aspect-square">
+          {isVideo ? (
+            <video
+              src={images[0] || "/placeholder.svg"}
+              className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (isClosing) return
+                
+                // On mobile, show message to go to gallery instead of opening modal (only if showMobileRedirect is true)
+                if (isMobile() && showMobileRedirect) {
+                  setShowMobileMessage(true)
+                  return
+                }
+                
+                setSelectedImageIndex(0)
+                setTouchStart(null)
+                setTouchEnd(null)
+              }}
+              muted
+              playsInline
+              preload="metadata"
+            />
+          ) : (
             <Image
               src={images[0] || "/placeholder.svg"}
-              alt={title || "Image"}
+              alt={title || "Media"}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover cursor-pointer hover:scale-105 transition-transform"
@@ -183,6 +209,13 @@ export default function AlbumGrid({ images, caption, title, isAlbum, showMobileR
               loading="lazy"
               quality={85}
             />
+          )}
+          {/* Video indicator */}
+          {isVideo && (
+            <div className="absolute top-2 right-2 bg-black/60 rounded-full p-1">
+              <Video className="h-3 w-3 text-white" />
+            </div>
+          )}
         </div>
         {caption && <p className="text-xs text-muted-foreground mt-2 italic line-clamp-2">{caption}</p>}
       </div>
@@ -192,43 +225,62 @@ export default function AlbumGrid({ images, caption, title, isAlbum, showMobileR
   return (
     <div className="w-full">
       <div className="grid grid-cols-2 md:grid-cols-3 gap-1 sm:gap-2 mb-2">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className="relative overflow-hidden rounded-lg bg-muted aspect-square group cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              if (isClosing) return
-              
-              // On mobile, show message to go to gallery instead of opening modal (only if showMobileRedirect is true)
-              if (isMobile() && showMobileRedirect) {
-                setShowMobileMessage(true)
-                return
-              }
-              
-              setSelectedImageIndex(index)
-              setTouchStart(null)
-              setTouchEnd(null)
-            }}
-          >
-            <Image
-              src={image || "/placeholder.svg"}
-              alt={`${title} - Image ${index + 1}`}
-              fill
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 33vw"
-              className="object-cover group-hover:scale-105 transition-transform"
-              loading="lazy"
-              quality={85}
-            />
-            {/* Show overlay on last image if more than 2 */}
-            {index === images.length - 1 && images.length > 2 && (
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                <span className="text-white font-semibold text-xs sm:text-sm">+{images.length - 1}</span>
-              </div>
-            )}
-          </div>
-        ))}
+        {images.map((image, index) => {
+          const isVideo = isVideoUrl(image)
+          return (
+            <div
+              key={index}
+              className="relative overflow-hidden rounded-lg bg-muted aspect-square group cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (isClosing) return
+                
+                // On mobile, show message to go to gallery instead of opening modal (only if showMobileRedirect is true)
+                if (isMobile() && showMobileRedirect) {
+                  setShowMobileMessage(true)
+                  return
+                }
+                
+                setSelectedImageIndex(index)
+                setTouchStart(null)
+                setTouchEnd(null)
+              }}
+            >
+              {isVideo ? (
+                <video
+                  src={image || "/placeholder.svg"}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  muted
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <Image
+                  src={image || "/placeholder.svg"}
+                  alt={`${title} - Media ${index + 1}`}
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform"
+                  loading="lazy"
+                  quality={85}
+                />
+              )}
+              {/* Video indicator */}
+              {isVideo && (
+                <div className="absolute top-2 right-2 bg-black/60 rounded-full p-1 z-10">
+                  <Video className="h-3 w-3 text-white" />
+                </div>
+              )}
+              {/* Show overlay on last media if more than 2 */}
+              {index === images.length - 1 && images.length > 2 && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <span className="text-white font-semibold text-xs sm:text-sm">+{images.length - 1}</span>
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       {/* Caption and album badge */}
@@ -317,7 +369,7 @@ export default function AlbumGrid({ images, caption, title, isAlbum, showMobileR
               <X className="h-5 w-5 sm:h-6 sm:w-6" />
             </Button>
 
-            {/* Image Container */}
+            {/* Media Container */}
             <div 
               className="relative w-full bg-black rounded-lg overflow-hidden flex items-center justify-center"
               onClick={(e) => {
@@ -337,15 +389,30 @@ export default function AlbumGrid({ images, caption, title, isAlbum, showMobileR
                 willChange: 'transform'
               }}
             >
-              <Image
-                src={images[selectedImageIndex] || "/placeholder.svg"}
-                alt={`${title} - Image ${selectedImageIndex + 1}`}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                className="object-contain"
-                quality={90}
-                priority
-              />
+              {isVideoUrl(images[selectedImageIndex]) ? (
+                <video
+                  src={images[selectedImageIndex] || "/placeholder.svg"}
+                  className="max-w-full max-h-full object-contain"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '80vh',
+                  }}
+                  controls
+                  autoPlay
+                  playsInline
+                  muted={false}
+                />
+              ) : (
+                <Image
+                  src={images[selectedImageIndex] || "/placeholder.svg"}
+                  alt={`${title} - Media ${selectedImageIndex + 1}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                  className="object-contain"
+                  quality={90}
+                  priority
+                />
+              )}
             </div>
 
             {/* Navigation Buttons - Only show for multiple images, hidden on mobile */}

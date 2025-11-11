@@ -5,8 +5,9 @@ import Image from "next/image"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, X, ImageIcon } from "lucide-react"
+import { ChevronLeft, ChevronRight, X, ImageIcon, Video } from "lucide-react"
 import AlbumGrid from "@/components/album-grid"
+import { isVideoUrl } from "@/lib/utils"
 
 interface GalleryImage {
   id: string
@@ -226,16 +227,44 @@ export default function ImageGallery({ images = [], isLoading = false }: ImageGa
                   />
                 </div>
               ) : (
-                <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden mb-3 sm:mb-4">
-                  <Image
-                    src={image.url || "/placeholder.svg"}
-                    alt={image.alt}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover hover:scale-105 transition-transform"
-                    loading="lazy"
-                    quality={85}
-                  />
+                <div 
+                  className="relative w-full h-48 bg-muted rounded-lg overflow-hidden mb-3 sm:mb-4 cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    if (isClosing) return
+                    setSelectedImage(image)
+                    setCurrentIndex(index)
+                    setCurrentAlbumIndex(0)
+                    setTouchStart(null)
+                    setTouchEnd(null)
+                  }}
+                >
+                  {isVideoUrl(image.url) ? (
+                    <video
+                      src={image.url || "/placeholder.svg"}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform"
+                      muted
+                      playsInline
+                      preload="metadata"
+                    />
+                  ) : (
+                    <Image
+                      src={image.url || "/placeholder.svg"}
+                      alt={image.alt}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover hover:scale-105 transition-transform"
+                      loading="lazy"
+                      quality={85}
+                    />
+                  )}
+                  {/* Video indicator */}
+                  {isVideoUrl(image.url) && (
+                    <div className="absolute top-2 right-2 bg-black/60 rounded-full p-1">
+                      <Video className="h-3 w-3 text-white" />
+                    </div>
+                  )}
                 </div>
               )}
             </Card>
@@ -288,7 +317,7 @@ export default function ImageGallery({ images = [], isLoading = false }: ImageGa
               <X className="h-6 w-6" />
             </Button>
 
-            {/* Image Container */}
+            {/* Media Container */}
             <div 
               className="relative w-full bg-black rounded-lg overflow-hidden"
               onClick={(e) => {
@@ -298,19 +327,34 @@ export default function ImageGallery({ images = [], isLoading = false }: ImageGa
               }}
               style={{ pointerEvents: isClosing ? 'none' : 'auto', height: '80vh' }}
             >
-              <Image
-                src={
-                  selectedImage.isAlbum && selectedImage.albumImages
-                    ? selectedImage.albumImages[currentAlbumIndex] || "/placeholder.svg"
-                    : selectedImage.url || "/placeholder.svg"
-                }
-                alt={selectedImage.alt}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                className="object-contain"
-                quality={90}
-                priority
-              />
+              {(() => {
+                const mediaUrl = selectedImage.isAlbum && selectedImage.albumImages
+                  ? selectedImage.albumImages[currentAlbumIndex] || "/placeholder.svg"
+                  : selectedImage.url || "/placeholder.svg"
+                const isVideo = isVideoUrl(mediaUrl)
+                
+                return isVideo ? (
+                  <video
+                    src={mediaUrl}
+                    className="w-full h-full object-contain"
+                    style={{ maxHeight: '80vh' }}
+                    controls
+                    autoPlay
+                    playsInline
+                    muted={false}
+                  />
+                ) : (
+                  <Image
+                    src={mediaUrl}
+                    alt={selectedImage.alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                    className="object-contain"
+                    quality={90}
+                    priority
+                  />
+                )
+              })()}
             </div>
 
             {/* Navigation Buttons - Only show for albums with multiple images, hidden on mobile */}
